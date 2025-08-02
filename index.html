@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Temple of Patience</title>
   <style>
     body {
@@ -24,7 +24,7 @@
       margin-bottom: 20px;
       color: #333;
     }
-    #start-button, #click-button {
+    button {
       font-size: 20px;
       padding: 12px 24px;
       margin-top: 10px;
@@ -60,7 +60,7 @@
     const resultText = document.getElementById('result');
 
     let goTime = 0;
-    let clickedEarly = false;
+    let earlyClickActive = false;
 
     startBtn.addEventListener('click', () => {
       statusText.textContent = 'The temple is silent... be patient.';
@@ -69,23 +69,29 @@
       resultText.textContent = '';
 
       const waitTime = Math.random() * 3000 + 2000; // 2–5 seconds
-      clickedEarly = false;
 
-      const earlyClickHandler = () => {
-        clickedEarly = true;
-        statusText.textContent = 'You moved too fast. The temple resets.';
-        clickBtn.style.display = 'none';
-        document.body.removeEventListener('click', earlyClickHandler);
+      earlyClickActive = true;
+
+      const earlyClickHandler = (e) => {
+        if (earlyClickActive && e.target !== clickBtn && e.target !== startBtn) {
+          earlyClickActive = false;
+          statusText.textContent = 'You moved too fast. The temple resets.';
+          clickBtn.style.display = 'none';
+          resultText.textContent = '';
+          document.removeEventListener('click', earlyClickHandler);
+          startBtn.style.display = 'inline-block';
+        }
       };
 
-      document.body.addEventListener('click', earlyClickHandler);
+      document.addEventListener('click', earlyClickHandler);
 
       setTimeout(() => {
-        if (!clickedEarly) {
+        if (earlyClickActive) {
           goTime = Date.now();
+          earlyClickActive = false;
           statusText.textContent = 'GO! Make your move!';
           clickBtn.style.display = 'inline-block';
-          document.body.removeEventListener('click', earlyClickHandler);
+          document.removeEventListener('click', earlyClickHandler);
         }
       }, waitTime);
     });
