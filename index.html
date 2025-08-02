@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Temple of Patience</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #e6f0f9;
+      padding-top: 100px;
+    }
+    #game-box {
+      background: white;
+      border: 2px solid #4d94ff;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #status {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    #start-button, #click-button {
+      font-size: 20px;
+      padding: 12px 24px;
+      margin-top: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #4d94ff;
+      color: white;
+    }
+    #click-button {
+      display: none;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #006600;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-box">
+    <h2>Temple of Patience</h2>
+    <div id="status">Wait for the GO signal...</div>
+    <button id="start-button">Enter the Temple</button>
+    <button id="click-button">ACT NOW</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('start-button');
+    const clickBtn = document.getElementById('click-button');
+    const statusText = document.getElementById('status');
+    const resultText = document.getElementById('result');
+
+    let goTime = 0;
+    let clickedEarly = false;
+
+    startBtn.addEventListener('click', () => {
+      statusText.textContent = 'The temple is silent... be patient.';
+      startBtn.style.display = 'none';
+      clickBtn.style.display = 'none';
+      resultText.textContent = '';
+
+      const waitTime = Math.random() * 3000 + 2000; // 2–5 seconds
+      clickedEarly = false;
+
+      const earlyClickHandler = () => {
+        clickedEarly = true;
+        statusText.textContent = 'You moved too fast. The temple resets.';
+        clickBtn.style.display = 'none';
+        document.body.removeEventListener('click', earlyClickHandler);
+      };
+
+      document.body.addEventListener('click', earlyClickHandler);
+
+      setTimeout(() => {
+        if (!clickedEarly) {
+          goTime = Date.now();
+          statusText.textContent = 'GO! Make your move!';
+          clickBtn.style.display = 'inline-block';
+          document.body.removeEventListener('click', earlyClickHandler);
+        }
+      }, waitTime);
+    });
+
+    clickBtn.addEventListener('click', () => {
+      const reactionTime = Date.now() - goTime;
+      statusText.textContent = 'You acted with wisdom.';
+      resultText.textContent = `You waited ${reactionTime} ms — the temple accepts your patience.`;
+      clickBtn.style.display = 'none';
+      startBtn.style.display = 'inline-block';
+    });
+  </script>
+</body>
+</html>
